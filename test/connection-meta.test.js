@@ -1,4 +1,4 @@
-/*global describe, it, before */
+/*global describe, it, before, after */
 var testUtils = require('./helper/test-utils'),
     assert = testUtils.assert;
 
@@ -20,6 +20,7 @@ describe("connection-meta", function() {
    *
    */
   before(function(done) {
+    this.timeout(600000); // set timeout to 10 min.
     testUtils.establishConnection(conn, config, done);
   });
 
@@ -217,7 +218,7 @@ describe("connection-meta", function() {
       assert.ok(_.isNumber(limitInfo.apiUsage.used));
       assert.ok(_.isNumber(limitInfo.apiUsage.limit));
       assert.ok(limitInfo.apiUsage.used > 0);
-      assert.ok(limitInfo.apiUsage.limit > limitInfo.apiUsage.used);
+      assert.ok(limitInfo.apiUsage.limit >= limitInfo.apiUsage.used);
     });
   });
 
@@ -245,16 +246,51 @@ describe("connection-meta", function() {
       conn.limits(function(err, limits) {
         assert.ok(_.isObject(limits));
         assert.ok(_.isObject(limits.DataStorageMB));
-        assert.ok(limits.DataStorageMB.Remaining > 0);
+        assert.ok(limits.DataStorageMB.Remaining >= 0);
         assert.ok(limits.DataStorageMB.Max > 0);
         assert.ok(_.isObject(limits.FileStorageMB));
-        assert.ok(limits.FileStorageMB.Remaining > 0);
+        assert.ok(limits.FileStorageMB.Remaining >= 0);
         assert.ok(limits.FileStorageMB.Max > 0);
         assert.ok(_.isObject(limits.DailyApiRequests));
-        assert.ok(limits.DailyApiRequests.Remaining > 0);
+        assert.ok(limits.DailyApiRequests.Remaining >= 0);
         assert.ok(limits.DailyApiRequests.Max > 0);
       }.check(done));
     });
+  });
+
+  /**
+   *
+   */
+  describe("get theme information", function() {
+    it("should get theme info in the org", function(done) {
+      conn.theme(function(err, theme) {
+        assert.ok(_.isObject(theme));
+        assert.ok(_.isArray(theme.themeItems));
+        theme.themeItems.forEach(function(t) {
+          assert.ok(_.isString(t.name));
+          assert.ok(_.isArray(t.colors) || t.colors === null);
+          (t.colors || []).forEach(function(c) {
+            assert.ok(_.isString(c.color));
+            assert.ok(_.isString(c.context));
+            assert.ok(_.isString(c.theme));
+          });
+          assert.ok(_.isArray(t.icons) || t.icons === null);
+          (t.icons || []).forEach(function(ic) {
+            assert.ok(_.isString(ic.url));
+            assert.ok(_.isNumber(ic.width));
+            assert.ok(_.isNumber(ic.height));
+            assert.ok(_.isString(ic.contentType));
+          });
+        });
+      }.check(done));
+    });
+  });
+
+  /**
+   *
+   */
+  after(function(done) {
+    testUtils.closeConnection(conn, done);
   });
 
 });
