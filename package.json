@@ -51,14 +51,6 @@
     "commander": "^2.6.0",
     "faye": "^1.1.0",
     "inherits": "^2.0.1",
-<<<<<<< HEAD
-    "open": "0.0.4",
-    "q": "0.9.x",
-    "readable-stream": "1.1.x",
-    "request": "2.51.x",
-    "underscore": "1.4.x",
-    "xml2js": "0.4.x"
-=======
     "open": "0.0.5",
     "promise": "^6.1.0",
     "readable-stream": "^1.1.13",
@@ -66,7 +58,6 @@
     "through2": "^1.1.1",
     "underscore": "^1.7.0",
     "xml2js": "^0.4.4"
->>>>>>> 4858c74695dfdaf4b149275919b2b03ccb00bdaa
   },
   "devDependencies": {
     "async": "^0.9.0",
